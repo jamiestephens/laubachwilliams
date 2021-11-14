@@ -12,6 +12,8 @@ rm(list=ls())
 if (!require("tis")) {install.packages("tis"); library("tis")} ## Time series package
 if (!require("nloptr")) {install.packages("nloptr"); library("nloptr")} ## Optimization
 
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ## Source all R programs
 source("calculate.covariance.R")
 source("format.output.R")
@@ -64,12 +66,15 @@ niter <- 5000
 ## Set run.se to TRUE to run the procedure
 run.se <- TRUE
 
-
 ##------------------------------------------------------------------------------##
 ## Read in data and compute inflation expectations series
 ##------------------------------------------------------------------------------##
-data <- read.table("LW_input_data.csv",
-                   sep=',',header=TRUE,stringsAsFactors=FALSE, na.strings=".")
+#data <- read.table("./Data/LW_input_data.csv",sep=',',na.strings=".",header=TRUE)
+                   #sep=',',skip=TRUE,stringsAsFactors=FALSE, na.strings=".")
+
+data <- read.table("./Data/LW_input_data.csv",skip=1,sep=',',na.strings=".",header=TRUE)
+colnames(data) <- c("date",'gdp.log','inflation','oil','import','interest')
+head(data)
 
 ## Get series beginning in data.start
 log.output.all                      <- tis(data$gdp.log, start=data.start, tif='quarterly')
@@ -80,7 +85,7 @@ relative.import.price.inflation.all <- tis(data$import, start=data.start,
                                            tif='quarterly') - inflation.all
 nominal.interest.rate.all           <- tis(data$interest, start=data.start, tif='quarterly')
 
-inflation.expectations.all          <- tis(data$inflation.expectations, start=data.start, tif='quarterly')
+#inflation.expectations.all          <- tis(data$inflation.expectations, start=data.start, tif='quarterly')
 
 ## Get data in vector form beginning at est.data.start (set above)
 log.output                      <- as.numeric(window(log.output.all, start=est.data.start))
@@ -91,10 +96,9 @@ relative.import.price.inflation <- as.numeric(window(relative.import.price.infla
                                                      start=est.data.start))
 nominal.interest.rate           <- as.numeric(window(nominal.interest.rate.all, start=est.data.start))
 
-inflation.expectations          <- as.numeric(window(inflation.expectations.all,
-                                                     start=est.data.start))
-real.interest.rate              <- nominal.interest.rate - inflation.expectations
-
+#inflation.expectations          <- as.numeric(window(inflation.expectations.all,start=est.data.start))
+#real.interest.rate              <- nominal.interest.rate - inflation.expectations
+real.interest.rate              <- nominal.interest.rate
 
 ##------------------------------------------------------------------------------##
 ## Run estimation

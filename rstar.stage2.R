@@ -57,7 +57,9 @@ rstar.stage2 <- function(log.output,
                   relative.import.price.inflation[9:(T+8)],
                   rep(1,T))
   
+  
   ## Starting values for the parameter vector
+  #initial.parameters <- c(b.is, -b.is[3], b.ph[1], b.ph[3], s.is, s.ph, 0.5)
   initial.parameters <- c(b.is, -b.is[3], b.ph[1:2], b.ph[4:6], s.is, s.ph, 0.5)
 
   ## Set an upper and lower bound on the parameter vectors:
@@ -80,14 +82,15 @@ rstar.stage2 <- function(log.output,
       if (initial.parameters[3] > a.r.constraint) {
           initial.parameters[3] <- a.r.constraint
       }
+      print("got here 1")
       theta.ub[3] <- a.r.constraint      
   }
-
+  print("got here 2")
   ## Get parameter estimates via maximum likelihood
   f <- function(theta) {return(-log.likelihood.wrapper(theta, y.data, x.data, stage, lambda.g, NA, xi.00, P.00)$ll.cum)}
   nloptr.out <- nloptr(initial.parameters, f, eval_grad_f=function(x) {gradient(f, x)},
                        lb=theta.lb,ub=theta.ub,
-                       opts=list("algorithm"="NLOPT_LD_LBFGS","xtol_rel"=1.0e-8,"maxeval"=200))
+                       opts=list("algorithm"="NLOPT_LD_LBFGS","xtol_rel"=1.0e-8,"maxeval"=5000))
   theta <- nloptr.out$solution
 
   if (nloptr.out$status==-1 | nloptr.out$status==5) {

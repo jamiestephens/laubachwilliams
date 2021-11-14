@@ -69,7 +69,8 @@ rstar.stage1 <- function(log.output,
   ## Get parameter estimates via maximum likelihood
   f <- function(theta) {return(-log.likelihood.wrapper(theta, y.data, x.data, stage, NA, NA, xi.00, P.00)$ll.cum)}
   nloptr.out <- nloptr(initial.parameters, f, eval_grad_f=function(x) {gradient(f, x)},
-                       lb=theta.lb, ub=theta.ub, opts=list("algorithm"="NLOPT_LD_LBFGS","xtol_rel"=1.0e-8,"maxeval"=200))
+                       lb=theta.lb, ub=theta.ub, 
+                       opts=list("algorithm"="NLOPT_LD_LBFGS","xtol_rel"=1.0e-8,"maxeval"=5000))
   theta <- nloptr.out$solution
   
   if (nloptr.out$status==-1 | nloptr.out$status==5) {
